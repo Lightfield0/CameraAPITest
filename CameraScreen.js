@@ -36,7 +36,9 @@ export default function CameraScreen() {
     });
 
     try {
-      const response = await fetch('http://YOUR_FLASK_SERVER_IP:5000/upload', {
+        const startTime = new Date(); // İşlem başlangıç zamanı
+
+      const response = await fetch('http://18.232.115.155:5000/upload', {
         method: 'POST',
         body: formData,
         headers: {
@@ -48,12 +50,15 @@ export default function CameraScreen() {
         throw new Error('Network response was not ok');
       }
 
-      const data = await response.text();
-      Alert.alert("Success", "Image uploaded successfully!");
+    const endTime = new Date(); // İşlem bitiş zamanı
+    const duration = endTime - startTime; // Milisaniye cinsinden süre
+
+    const data = await response.text();
+    Alert.alert("Success", `Image uploaded successfully!\nResponse time: ${duration} ms`);
       setOverlayVisible(false); // Hide overlay after uploading
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Failed to upload image.");
+      Alert.alert("Error", `Failed to upload image. ${error}`);
     }
   };
 
