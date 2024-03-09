@@ -3,6 +3,7 @@ import { StyleSheet, View, Image, Alert, Text, Dimensions } from 'react-native';
 import { Camera } from 'expo-camera';
 import { Button, Overlay, Divider } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios'; // Axios'u import edin
 
 export default function CameraScreen() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -19,10 +20,10 @@ export default function CameraScreen() {
 
   const takePicture = async () => {
     if (cameraRef) {
-        const options = { quality: 0.5, base64: true };
-        const data = await cameraRef.takePictureAsync(options);
-        setImage(data.uri);
-        setOverlayVisible(true);
+      const options = { quality: 0.5, base64: true };
+      const data = await cameraRef.takePictureAsync(options);
+      setImage(data.uri);
+      setOverlayVisible(true);
     }
   };
 
@@ -36,25 +37,18 @@ export default function CameraScreen() {
     });
 
     try {
-        const startTime = new Date(); // İşlem başlangıç zamanı
+      const startTime = new Date(); // İşlem başlangıç zamanı
 
-      const response = await fetch('http://18.232.115.155:5000/upload', {
-        method: 'POST',
-        body: formData,
+      await axios.post('http://18.232.115.155:5000/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      const endTime = new Date(); // İşlem bitiş zamanı
+      const duration = endTime - startTime; // Milisaniye cinsinden süre
 
-    const endTime = new Date(); // İşlem bitiş zamanı
-    const duration = endTime - startTime; // Milisaniye cinsinden süre
-
-    const data = await response.text();
-    Alert.alert("Success", `Image uploaded successfully!\nResponse time: ${duration} ms`);
+      Alert.alert("Success", `Image uploaded successfully!\nResponse time: ${duration} ms`);
       setOverlayVisible(false); // Hide overlay after uploading
     } catch (error) {
       console.error(error);
@@ -95,6 +89,7 @@ export default function CameraScreen() {
     </View>
   );
 }
+
 // Ekran boyutlarını al
 const { width: screenWidth } = Dimensions.get('window');
 
